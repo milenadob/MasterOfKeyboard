@@ -17,7 +17,7 @@ class MenuWindow(Qtw.QFrame):
         self.stack.addWidget(self.stack1_start)
         self.stack.addWidget(self.stack2_statistics)
         self.stack.addWidget(self.stack3_options)
-        self.stack3.file_choosing_button.clicked.connect(self.get_text_file)
+        self.stack3_options.file_choosing_button.clicked.connect(self.get_text_file)
 
         self.file_name = "resources/text.txt"        # default
         self.stack3_options.file_chosen_display_label.setText('Chosen file: ' + self.file_name)
@@ -25,8 +25,8 @@ class MenuWindow(Qtw.QFrame):
 
         self.leftMenu = MenuWidget()
         self.leftMenu.start_button.clicked.connect(self.open_game_window)
-        self.leftMenu.statistics_button.clicked.connect(lambda: self.stack.setCurrentWidget(self.stack2))
-        self.leftMenu.options_button.clicked.connect(lambda: self.stack.setCurrentWidget(self.stack3))
+        self.leftMenu.statistics_button.clicked.connect(lambda: self.stack.setCurrentWidget(self.stack2_statistics))
+        self.leftMenu.options_button.clicked.connect(lambda: self.stack.setCurrentWidget(self.stack3_options))
         self.leftMenu.exit_button.clicked.connect(self.close)
 
         window_layout = Qtw.QGridLayout()
