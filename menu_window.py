@@ -1,3 +1,4 @@
+# icons used in application comes from site icon8.com
 from PyQt5 import QtWidgets as Qtw
 from PyQt5 import QtGui as Qtg
 import sys
@@ -20,8 +21,7 @@ class MenuWindow(Qtw.QFrame):
         self.stack.addWidget(self.stack3_options)
         self.stack3_options.file_choosing_button.clicked.connect(self.get_text_file)
 
-        self.file_name = "resources/text.txt"        # default
-        self.stack3_options.file_chosen_display_label.setText('Chosen file: ' + self.file_name)
+        self.file_name = ""
         self.game_window = None
 
         self.left_menu = MenuWidget()
@@ -37,6 +37,8 @@ class MenuWindow(Qtw.QFrame):
         self.show()
 
     def open_game_window(self):
+        if self.file_name == "":
+            self.file_name = "resources/text.txt"        # default
         self.game_window = GameWindow(self.file_name)
         self.game_window.show()
         self.close()
@@ -52,5 +54,5 @@ if __name__ == '__main__':
     window = MenuWindow()
     window.setWindowTitle("Master of keyboard")
     window.setFixedSize(1500, 800)
-    window.setWindowIcon(Qtg.QIcon('resources/keyboard.png'))
+    window.setWindowIcon(Qtg.QIcon('resources/icons8-keyboard-96.png'))
     sys.exit(app.exec_())

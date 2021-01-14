@@ -65,6 +65,12 @@ class GameWindow(Qtw.QFrame):
                 self.text_input.setStyleSheet('color:red')
 
 
+class GameWindowMenu(Qtw.QFrame):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
 if __name__ == '__main__':
     app = Qtw.QApplication(sys.argv)
     window = GameWindow("resources/text.txt")

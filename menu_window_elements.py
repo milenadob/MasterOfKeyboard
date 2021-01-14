@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets as Qtw
 from PyQt5 import QtGui as Qtg
+from PyQt5 import QtCore as Qtc
 
 
 class StatisticsWidget(Qtw.QFrame):
@@ -40,17 +41,25 @@ class MenuWidget(Qtw.QFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.start_button = Qtw.QPushButton('Start')
-        self.statistics_button = Qtw.QPushButton('Statistics')
-        self.options_button = Qtw.QPushButton('Options')
-        self.exit_button = Qtw.QPushButton('Exit')
+        self.start_button = Qtw.QPushButton('    Start')
+        self.start_button.setIcon(Qtg.QIcon('resources/icons8-play-96.png'))
+        self.start_button.setIconSize(Qtc.QSize(50, 50))
+        self.statistics_button = Qtw.QPushButton(' Statistics')
+        self.statistics_button.setIcon(Qtg.QIcon('resources/icons8-increase-96.png'))
+        self.statistics_button.setIconSize(Qtc.QSize(50, 50))
+        self.options_button = Qtw.QPushButton('  Options')
+        self.options_button.setIcon(Qtg.QIcon('resources/icons8-settings-96.png'))
+        self.options_button.setIconSize(Qtc.QSize(50, 50))
+        self.exit_button = Qtw.QPushButton('     Exit')
+        self.exit_button.setIcon(Qtg.QIcon('resources/icons8-delete-96.png'))
+        self.exit_button.setIconSize(Qtc.QSize(50, 50))
 
         menu_layout = Qtw.QVBoxLayout(self)
         menu_layout.addWidget(self.start_button)
         menu_layout.addWidget(self.statistics_button)
         menu_layout.addWidget(self.options_button)
         menu_layout.addWidget(self.exit_button)
-        menu_layout.addStretch(1)
+        # menu_layout.addStretch(1)
         self.setLayout(menu_layout)
 
         self.setFrameStyle(Qtw.QFrame.Panel | Qtw.QFrame.Raised)
@@ -62,10 +71,10 @@ class StartDisplayWidget(Qtw.QFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        logo_image = Qtg.QPixmap('resources/keyboard.png')
-        self.logo_label = Qtw.QLabel(self)
-        self.logo_label.setPixmap(logo_image)
+        #logo_image = Qtg.QPixmap('resources/keyboard.png')
+       # self.logo_label = Qtw.QLabel(self)
+        #self.logo_label.setPixmap(logo_image)
 
         layout = Qtw.QVBoxLayout()
-        layout.addWidget(self.logo_label)
+        #layout.addWidget(self.logo_label)
         self.setLayout(layout)

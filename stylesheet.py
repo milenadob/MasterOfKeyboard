@@ -1,21 +1,18 @@
 stylesheet = """
-QPushButton{
-    border-image: url(resources/blue_button00.png);
-    height: 49px;
-    width: 190px;
-    max-height: 49px;
+MenuWidget QPushButton{
+    border :2px solid ;
+    border-color : qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 #d60cf0, stop:1 #9a08ed);
+    max-height: 100px;
     max-width: 190px;
     margin-left: 15px;
     margin-right: 15px;
-    margin-top: 15px;
-    color: white;  
-    font-size: 18px;
+    color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 #d60cf0, stop:1 #9a08ed);  
+    font-size: 20px;
+    font-weight: bold;
 }
 
-QPushButton:pressed{
-    border-image: url(resources/blue_button01.png);
-    height: 45px;
-    width: 190px;
+MenuWidget QPushButton:pressed{
+    background-color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 rgba(240,213,255,180), stop:1 rgba(181,238,255,180));
 }
 
 OptionsWidget QLabel{
@@ -38,7 +35,6 @@ MenuWindow{
 
 MenuWidget{
     background-color: rgba(255,255,255,180);
-    padding-top: 30px;
 }
 
 OptionsWidget, StatisticsWidget{
