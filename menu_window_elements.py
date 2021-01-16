@@ -59,22 +59,7 @@ class MenuWidget(Qtw.QFrame):
         menu_layout.addWidget(self.statistics_button)
         menu_layout.addWidget(self.options_button)
         menu_layout.addWidget(self.exit_button)
-        # menu_layout.addStretch(1)
         self.setLayout(menu_layout)
 
         self.setFrameStyle(Qtw.QFrame.Panel | Qtw.QFrame.Raised)
-        self.setFixedSize(250, 700)
-
-
-class StartDisplayWidget(Qtw.QFrame):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        #logo_image = Qtg.QPixmap('resources/keyboard.png')
-       # self.logo_label = Qtw.QLabel(self)
-        #self.logo_label.setPixmap(logo_image)
-
-        layout = Qtw.QVBoxLayout()
-        #layout.addWidget(self.logo_label)
-        self.setLayout(layout)
+        self.setFixedSize(400, 750)

@@ -1,8 +1,9 @@
 # icons used in application comes from site icon8.com
 from PyQt5 import QtWidgets as Qtw
 from PyQt5 import QtGui as Qtg
+from PyQt5 import QtCore as Qtc
 import sys
-from menu_window_elements import StatisticsWidget, OptionsWidget, MenuWidget, StartDisplayWidget
+from menu_window_elements import StatisticsWidget, OptionsWidget, MenuWidget
 from stylesheet import stylesheet
 from game_window import GameWindow
 
@@ -12,8 +13,10 @@ class MenuWindow(Qtw.QFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.setWindowFlag(Qtc.Qt.FramelessWindowHint)
+        self.setAttribute(Qtc.Qt.WA_TranslucentBackground, True)
         self.stack = Qtw.QStackedWidget(self)
-        self.stack1_start = StartDisplayWidget()
+        self.stack1_start = Qtw.QWidget()
         self.stack2_statistics = StatisticsWidget()
         self.stack3_options = OptionsWidget()
         self.stack.addWidget(self.stack1_start)
@@ -40,6 +43,8 @@ class MenuWindow(Qtw.QFrame):
         if self.file_name == "":
             self.file_name = "resources/text.txt"        # default
         self.game_window = GameWindow(self.file_name)
+        sizeObject = Qtw.QDesktopWidget().screenGeometry(0)
+        self.game_window.setGeometry(sizeObject.width() // 2 - 800, sizeObject.height() // 2 - 400, 1800, 800)
         self.game_window.show()
         self.close()
 
@@ -50,9 +55,11 @@ class MenuWindow(Qtw.QFrame):
 
 if __name__ == '__main__':
     app = Qtw.QApplication(sys.argv)
+    sizeObject = Qtw.QDesktopWidget().screenGeometry(0)
     app.setStyleSheet(stylesheet)
     window = MenuWindow()
-    window.setWindowTitle("Master of keyboard")
-    window.setFixedSize(1500, 800)
-    window.setWindowIcon(Qtg.QIcon('resources/icons8-keyboard-96.png'))
+    # window.setWindowTitle("Master of keyboard")
+    # window.setFixedSize(1900, 800)
+    window.setGeometry(sizeObject.width()//2 - 800, sizeObject.height()//2 - 400, 1800, 800)
+    # window.setWindowIcon(Qtg.QIcon('resources/icons8-keyboard-96.png'))
     sys.exit(app.exec_())
