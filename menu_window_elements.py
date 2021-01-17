@@ -54,6 +54,19 @@ class MenuWidget(Qtw.QFrame):
         self.exit_button.setIcon(Qtg.QIcon('resources/icons8-delete-96.png'))
         self.exit_button.setIconSize(Qtc.QSize(50, 50))
 
+        shadow1 = Qtw.QGraphicsDropShadowEffect()
+        shadow1.setBlurRadius(15)
+        shadow2 = Qtw.QGraphicsDropShadowEffect()
+        shadow2.setBlurRadius(15)
+        shadow3 = Qtw.QGraphicsDropShadowEffect()
+        shadow3.setBlurRadius(15)
+        shadow4 = Qtw.QGraphicsDropShadowEffect()
+        shadow4.setBlurRadius(15)
+        self.start_button.setGraphicsEffect(shadow1)
+        self.statistics_button.setGraphicsEffect(shadow2)
+        self.options_button.setGraphicsEffect(shadow3)
+        self.exit_button.setGraphicsEffect(shadow4)
+
         menu_layout = Qtw.QVBoxLayout(self)
         menu_layout.addWidget(self.start_button)
         menu_layout.addWidget(self.statistics_button)
@@ -62,4 +75,4 @@ class MenuWidget(Qtw.QFrame):
         self.setLayout(menu_layout)
 
         self.setFrameStyle(Qtw.QFrame.Panel | Qtw.QFrame.Raised)
-        self.setFixedSize(400, 750)
+        self.setFixedSize(250, 750)

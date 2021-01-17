@@ -13,8 +13,8 @@ class MenuWindow(Qtw.QFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.setWindowFlag(Qtc.Qt.FramelessWindowHint)
-        self.setAttribute(Qtc.Qt.WA_TranslucentBackground, True)
+        # self.setWindowFlag(Qtc.Qt.FramelessWindowHint)
+        # self.setAttribute(Qtc.Qt.WA_TranslucentBackground, True)
         self.stack = Qtw.QStackedWidget(self)
         self.stack1_start = Qtw.QWidget()
         self.stack2_statistics = StatisticsWidget()
@@ -44,7 +44,8 @@ class MenuWindow(Qtw.QFrame):
             self.file_name = "resources/text.txt"        # default
         self.game_window = GameWindow(self.file_name)
         sizeObject = Qtw.QDesktopWidget().screenGeometry(0)
-        self.game_window.setGeometry(sizeObject.width() // 2 - 800, sizeObject.height() // 2 - 400, 1800, 800)
+        self.game_window.setGeometry(sizeObject.width() // 2 - 800, sizeObject.height() // 2 - 400, 1500, 800)
+        self.game_window.setFixedSize(1500, 800)
         self.game_window.show()
         self.close()
 
@@ -58,8 +59,8 @@ if __name__ == '__main__':
     sizeObject = Qtw.QDesktopWidget().screenGeometry(0)
     app.setStyleSheet(stylesheet)
     window = MenuWindow()
-    # window.setWindowTitle("Master of keyboard")
-    # window.setFixedSize(1900, 800)
-    window.setGeometry(sizeObject.width()//2 - 800, sizeObject.height()//2 - 400, 1800, 800)
-    # window.setWindowIcon(Qtg.QIcon('resources/icons8-keyboard-96.png'))
+    window.setWindowTitle("Master of keyboard")
+    window.setFixedSize(1500, 800)
+    window.setGeometry(sizeObject.width()//2 - 800, sizeObject.height()//2 - 400, 1500, 800)
+    window.setWindowIcon(Qtg.QIcon('resources/icons8-keyboard-96.png'))
     sys.exit(app.exec_())
