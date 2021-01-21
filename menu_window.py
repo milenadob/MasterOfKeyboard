@@ -46,6 +46,8 @@ class MenuWindow(Qtw.QFrame):
         sizeObject = Qtw.QDesktopWidget().screenGeometry(0)
         self.game_window.setGeometry(sizeObject.width() // 2 - 800, sizeObject.height() // 2 - 400, 1500, 800)
         self.game_window.setFixedSize(1500, 800)
+        self.game_window.setWindowIcon(Qtg.QIcon('resources/icons8-keyboard-96.png'))
+        self.game_window.setWindowTitle("Master of keyboard")
         self.game_window.show()
         self.close()
 

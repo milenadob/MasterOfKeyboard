@@ -12,6 +12,7 @@ QPushButton{
 QPushButton:pressed{
     background-color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 rgba(240,213,255,180), stop:1 rgba(181,238,255,180));
 }
+
 MenuWindow{
     border-image: url(resources/key.png) 0 0 0 0 stretch stretch;
 }
@@ -85,6 +86,7 @@ GameWindowMenu{
 
 KeyboardWidget{
     background-color: white;
+    margin-top: 100px;
 }
 
 KeyboardWidget QPushButton{
