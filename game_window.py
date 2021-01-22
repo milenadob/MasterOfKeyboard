@@ -3,6 +3,7 @@ from PyQt5 import QtGui, QtCore
 import sys
 from keyboard import KeyboardWidget
 from game_logic import GameLogic
+from threading import Timer
 
 
 class GameWindow(QFrame):
@@ -44,14 +45,7 @@ class GameWindow(QFrame):
             self.game_menu.progress_bar.setValue(self.progress)
 
     def check_text_input(self, text):
-        self.game_widget.text_input.setStyleSheet('color:black')
-
-        self.game_widget.keyboard_widget.change_to_button_pressed_style(
-            self.game_widget.keyboard_widget.check_key_pressed(self.game_widget.keypressed))
-        [self.game_widget.keyboard_widget.change_to_button_normal_style(
-            self.game_widget.keyboard_widget.check_key_pressed(i)) for i in self.game_widget.lastkey
-            if i != self.game_widget.keypressed]
-        self.game_widget.lastkey.clear()
+        self.game_widget.text_input.setStyleSheet('color:rgba(112,112,165,180);')
 
         if text != "":
             if text in self.data[self.line_index]:
@@ -84,27 +78,32 @@ class GameWidget(QFrame):
         self.time_label = QLabel()
         self.text_input = CustomLineEdit()
         self.text_input.returnPressed.connect(self.change_text_input2)
-        self.time_label2 = QLabel()
+        self.show_text_label2 = QLabel()
         self.text_input2 = CustomLineEdit()
         self.text_input2.returnPressed.connect(self.change_text_input3)
-        self.time_label3 = QLabel()
+        self.show_text_label3 = QLabel()
         self.text_input3 = CustomLineEdit()
         self.text_input3.returnPressed.connect(self.change_text_input)
+
+        container = QFrame()
+        container.setObjectName("text_input_frame")
+        entry_layout = QVBoxLayout()
+        entry_layout.addWidget(self.show_text_label)
+        entry_layout.addWidget(self.time_label)
+        entry_layout.addWidget(self.text_input)
+        entry_layout.addWidget(self.show_text_label2)
+        entry_layout.addWidget(self.text_input2)
+        entry_layout.addWidget(self.show_text_label3)
+        entry_layout.addWidget(self.text_input3)
+        container.setLayout(entry_layout)
+
         self.keyboard_widget = KeyboardWidget()
+
         layout = QVBoxLayout()
-        layout.addWidget(self.show_text_label)
-        layout.addWidget(self.time_label)
-        layout.addWidget(self.text_input)
-        layout.addWidget(self.time_label2)
-        layout.addWidget(self.text_input2)
-        layout.addWidget(self.time_label3)
-        layout.addWidget(self.text_input3)
+        layout.addWidget(container)
         layout.addWidget(self.keyboard_widget)
         self.setLayout(layout)
         self.setFixedWidth(1100)
-
-        self.keypressed = None
-        self.lastkey = []
 
     def change_text_input2(self):
         self.text_input2.setFocus()
@@ -119,15 +118,22 @@ class GameWidget(QFrame):
 class CustomLineEdit(QLineEdit):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.last_key = []
 
     def keyPressEvent(self, a0: QtGui.QKeyEvent) -> None:
         if not a0.isAutoRepeat():
-            self.parent().keypressed = a0.key()
+            print(a0.key())
+            button = self.parent().parent().keyboard_widget.check_key_pressed(a0.key())
+            self.parent().parent().keyboard_widget.change_to_button_pressed_style(button)
+            [self.parent().parent().keyboard_widget.change_to_button_normal_style(
+                self.parent().parent().keyboard_widget.check_key_pressed(i)) for i in self.last_key
+                if i != a0.key()]
+            self.last_key.clear()
         super(CustomLineEdit, self).keyPressEvent(a0)
 
     def keyReleaseEvent(self, a0: QtGui.QKeyEvent) -> None:
         if not a0.isAutoRepeat():
-            self.parent().lastkey.append(a0.key())
+            self.last_key.append(a0.key())
         super(CustomLineEdit, self).keyReleaseEvent(a0)
 
 

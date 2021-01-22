@@ -11,7 +11,7 @@ class StatisticsWidget(Qtw.QFrame):
         layout = Qtw.QVBoxLayout()
         self.setLayout(layout)
 
-        self.setFrameStyle(Qtw.QFrame.Panel | Qtw.QFrame.Raised)
+        # self.setFrameStyle(Qtw.QFrame.Panel | Qtw.QFrame.Raised)
         self.setFixedSize(1100, 750)
 
 
@@ -32,7 +32,7 @@ class OptionsWidget(Qtw.QFrame):
         layout.addWidget(self.file_chosen_display_label)
         self.setLayout(layout)
 
-        self.setFrameStyle(Qtw.QFrame.Panel | Qtw.QFrame.Raised)
+        # self.setFrameStyle(Qtw.QFrame.Panel | Qtw.QFrame.Raised)
         self.setFixedSize(1100, 750)
 
 
@@ -74,5 +74,5 @@ class MenuWidget(Qtw.QFrame):
         menu_layout.addWidget(self.exit_button)
         self.setLayout(menu_layout)
 
-        self.setFrameStyle(Qtw.QFrame.Panel | Qtw.QFrame.Raised)
+        # self.setFrameStyle(Qtw.QFrame.Panel | Qtw.QFrame.Raised)
         self.setFixedSize(250, 750)

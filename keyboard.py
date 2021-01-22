@@ -1,12 +1,11 @@
 from PyQt5.QtWidgets import QPushButton, QFrame, QGridLayout, QGraphicsDropShadowEffect
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtCore import QSize, Qt
 
 
 class KeyboardWidget(QFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.key_layout = QGridLayout()
         self.key_table = [['Esc', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Back'],
                      ['Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\'],
@@ -57,7 +56,7 @@ class KeyboardWidget(QFrame):
                     self.key_layout.addWidget(QPushButton(tab[i]), row, col, 1, button_length)
                 self.add_keys_shadow(row, col)
                 button = self.key_layout.itemAtPosition(row, col).widget()
-                button.setAccessibleName(tab[i])
+                button.setObjectName(tab[i])
                 col += button_length
                 i += 1
             row += 1
@@ -66,7 +65,7 @@ class KeyboardWidget(QFrame):
         button = self.key_layout.itemAtPosition(row, col).widget()
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(20)
-        shadow.setColor(Qt.darkCyan)
+        shadow.setColor(QColor.fromRgb(112, 122, 170))
         shadow.setOffset(4, 4)
         button.setGraphicsEffect(shadow)
 
@@ -74,22 +73,18 @@ class KeyboardWidget(QFrame):
         items = [self.key_layout.itemAt(i).widget() for i in range(self.key_layout.count())]
         for button in items:
             if key == Qt.Key_Backspace:
-                if button.text() == 'Back':
-                    return button
+                return self.findChild(QPushButton, 'Back')
             elif key == Qt.Key_Tab:
-                if button.text() == 'Tab':
-                    return button
+                return self.findChild(QPushButton, 'Tab')
             elif key == Qt.Key_Enter:
-                return self.key_layout.findChild(QPushButton, "Enter")
+                return self.findChild(QPushButton, 'Enter')
             # elif key == Qt.Key_Shift:
             #    if button.text() == 'Shift':
             #        return button
             elif key == Qt.Key_CapsLock:
-                if button.text() == 'CapsLk':
-                    return button
+                return self.findChild(QPushButton, 'CapsLk')
             elif key == Qt.Key_Space:
-                if button.text() == 'Space':
-                    return button
+                return self.findChild(QPushButton, 'Space')
             # elif key == Qt.Key_Alt:
             #     if button.text() == 'Alt':
             #         return button
@@ -103,7 +98,6 @@ class KeyboardWidget(QFrame):
         if button is not None:
             button.setStyleSheet("background-color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 rgba(240,213,255,180), stop:1 rgba(181,238,255,180));")
 
-
     def change_to_button_normal_style(self, button):
         if button is not None:
-            button.setStyleSheet("background-color: rgba(255,255,255,0));")
+            button.setStyleSheet("background-color: rgba(255,255,255,255);")
