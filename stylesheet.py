@@ -96,7 +96,7 @@ GameWindowMenu{
 
 KeyboardWidget{
     background-color: rgba(255,255,255,180);
-    margin-top: 60px;
+    margin-top: 40px;
     border-radius: 5px;
     border: 3px solid rgb(112,112,170);
     border-right: 6px solid rgb(112,112,170);

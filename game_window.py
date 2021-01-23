@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit
+from PyQt5.QtWidgets import QApplication, QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QShortcut
 from PyQt5 import QtGui, QtCore
 import sys
 from keyboard import KeyboardWidget
@@ -122,18 +122,18 @@ class CustomLineEdit(QLineEdit):
 
     def keyPressEvent(self, a0: QtGui.QKeyEvent) -> None:
         if not a0.isAutoRepeat():
-            print(a0.key())
-            button = self.parent().parent().keyboard_widget.check_key_pressed(a0.key())
+            button = self.parent().parent().keyboard_widget.check_key_pressed(a0.key(), a0.nativeScanCode())
             self.parent().parent().keyboard_widget.change_to_button_pressed_style(button)
             [self.parent().parent().keyboard_widget.change_to_button_normal_style(
-                self.parent().parent().keyboard_widget.check_key_pressed(i)) for i in self.last_key
-                if i != a0.key()]
+                self.parent().parent().keyboard_widget.check_key_pressed(i[0], i[1])) for i in self.last_key
+                if i[1] != a0.nativeScanCode()]
             self.last_key.clear()
+        print(a0.key())
         super(CustomLineEdit, self).keyPressEvent(a0)
 
     def keyReleaseEvent(self, a0: QtGui.QKeyEvent) -> None:
         if not a0.isAutoRepeat():
-            self.last_key.append(a0.key())
+            self.last_key.append((a0.key(), a0.nativeScanCode()))
         super(CustomLineEdit, self).keyReleaseEvent(a0)
 
 

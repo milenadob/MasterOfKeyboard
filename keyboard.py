@@ -8,10 +8,10 @@ class KeyboardWidget(QFrame):
         super().__init__(*args, **kwargs)
         self.key_layout = QGridLayout()
         self.key_table = [['Esc', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Back'],
-                     ['Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\'],
-                     ['CapsLk', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', '\'', 'Enter'],
-                     ['ShiftL', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', 'ShiftR'],
-                     ['CtrlL', 'WinL', 'AltL', 'Space', 'AltR', 'WinR', 'Menu', 'CtrlR']]
+                          ['Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\'],
+                          ['CapsLk', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', '\'', 'Enter'],
+                          ['ShiftL', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', 'ShiftR'],
+                          ['CtrlL', 'WinL', 'AltL', 'Space', 'AltR', 'WinR', 'Menu', 'CtrlR']]
         self.init_keyboard()
         self.setLayout(self.key_layout)
 
@@ -64,33 +64,38 @@ class KeyboardWidget(QFrame):
     def add_keys_shadow(self, row, col):
         button = self.key_layout.itemAtPosition(row, col).widget()
         shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(20)
+        shadow.setBlurRadius(3)
         shadow.setColor(QColor.fromRgb(112, 122, 170))
-        shadow.setOffset(4, 4)
+        shadow.setOffset(2, 3)
         button.setGraphicsEffect(shadow)
 
-    def check_key_pressed(self, key):
+    def check_key_pressed(self, key,sc):
         items = [self.key_layout.itemAt(i).widget() for i in range(self.key_layout.count())]
         for button in items:
             if key == Qt.Key_Backspace:
                 return self.findChild(QPushButton, 'Back')
             elif key == Qt.Key_Tab:
                 return self.findChild(QPushButton, 'Tab')
+            elif key == Qt.Key_Escape:
+                return self.findChild(QPushButton, 'Esc')
             elif key == Qt.Key_Enter:
                 return self.findChild(QPushButton, 'Enter')
-            # elif key == Qt.Key_Shift:
-            #    if button.text() == 'Shift':
-            #        return button
+            elif sc == 42:
+                return self.findChild(QPushButton, 'ShiftL')
+            elif sc == 54:
+                return self.findChild(QPushButton, 'ShiftR')
             elif key == Qt.Key_CapsLock:
                 return self.findChild(QPushButton, 'CapsLk')
             elif key == Qt.Key_Space:
                 return self.findChild(QPushButton, 'Space')
-            # elif key == Qt.Key_Alt:
-            #     if button.text() == 'Alt':
-            #         return button
-            # elif key == Qt.Key_Control:
-            #     if button.text() == 'Ctrl':
-            #         return button
+            elif sc == 56:
+                return self.findChild(QPushButton, 'AltL')
+            elif sc == 312:
+                return self.findChild(QPushButton, 'AltR')
+            elif sc == 29:
+                return self.findChild(QPushButton, 'CtrlL')
+            elif sc == 285:
+                return self.findChild(QPushButton, 'CtrlR')
             elif len(button.text()) == 1 and ord(button.text()) == key:
                 return button
 
