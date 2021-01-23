@@ -121,19 +121,26 @@ class CustomLineEdit(QLineEdit):
         self.last_key = []
 
     def keyPressEvent(self, a0: QtGui.QKeyEvent) -> None:
-        if not a0.isAutoRepeat():
-            button = self.parent().parent().keyboard_widget.check_key_pressed(a0.key(), a0.nativeScanCode())
-            self.parent().parent().keyboard_widget.change_to_button_pressed_style(button)
-            [self.parent().parent().keyboard_widget.change_to_button_normal_style(
-                self.parent().parent().keyboard_widget.check_key_pressed(i[0], i[1])) for i in self.last_key
-                if i[1] != a0.nativeScanCode()]
-            self.last_key.clear()
         print(a0.key())
+        if int(a0.modifiers()) & QtCore.Qt.ShiftModifier:
+            shift_pressed = True
+        else:
+            shift_pressed = False
+        button = self.parent().parent().keyboard_widget.check_key_pressed(a0.key(), a0.nativeScanCode(), shift_pressed)
+        self.parent().parent().keyboard_widget.change_to_button_pressed_style(button)
+        [self.parent().parent().keyboard_widget.change_to_button_normal_style(
+                self.parent().parent().keyboard_widget.check_key_pressed(i[0], i[1], i[2]))
+                for i in self.last_key if i[1] != a0.nativeScanCode()]
+        self.last_key.clear()
+
         super(CustomLineEdit, self).keyPressEvent(a0)
 
     def keyReleaseEvent(self, a0: QtGui.QKeyEvent) -> None:
-        if not a0.isAutoRepeat():
-            self.last_key.append((a0.key(), a0.nativeScanCode()))
+        if int(a0.modifiers()) & QtCore.Qt.ShiftModifier:
+            last_shift = True
+        else:
+            last_shift = False
+        self.last_key.append((a0.key(), a0.nativeScanCode(), last_shift))
         super(CustomLineEdit, self).keyReleaseEvent(a0)
 
 

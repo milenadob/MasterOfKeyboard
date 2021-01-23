@@ -12,6 +12,9 @@ class KeyboardWidget(QFrame):
                           ['CapsLk', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', '\'', 'Enter'],
                           ['ShiftL', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', 'ShiftR'],
                           ['CtrlL', 'WinL', 'AltL', 'Space', 'AltR', 'WinR', 'Menu', 'CtrlR']]
+        self.shift_pressed = [('1', '!'), ('2', '@'), ('3', '#'), ('4', '$'), ('5', '%'), ('6', '^'), ('7', '&'),
+                              ('8', '*'), ('9', '('), ('0', ')'), ('-', '_'), ('=', '+'), ('[', '{'), (']', '}'),
+                              ('\\', '|'), (';', ':'), ('\'', '\"'), (',', '<'), ('.', '>'), ('/', '?')]
         self.init_keyboard()
         self.setLayout(self.key_layout)
 
@@ -69,35 +72,40 @@ class KeyboardWidget(QFrame):
         shadow.setOffset(2, 3)
         button.setGraphicsEffect(shadow)
 
-    def check_key_pressed(self, key,sc):
-        items = [self.key_layout.itemAt(i).widget() for i in range(self.key_layout.count())]
-        for button in items:
-            if key == Qt.Key_Backspace:
-                return self.findChild(QPushButton, 'Back')
-            elif key == Qt.Key_Tab:
-                return self.findChild(QPushButton, 'Tab')
-            elif key == Qt.Key_Escape:
-                return self.findChild(QPushButton, 'Esc')
-            elif key == Qt.Key_Enter:
-                return self.findChild(QPushButton, 'Enter')
-            elif sc == 42:
-                return self.findChild(QPushButton, 'ShiftL')
-            elif sc == 54:
-                return self.findChild(QPushButton, 'ShiftR')
-            elif key == Qt.Key_CapsLock:
-                return self.findChild(QPushButton, 'CapsLk')
-            elif key == Qt.Key_Space:
-                return self.findChild(QPushButton, 'Space')
-            elif sc == 56:
-                return self.findChild(QPushButton, 'AltL')
-            elif sc == 312:
-                return self.findChild(QPushButton, 'AltR')
-            elif sc == 29:
-                return self.findChild(QPushButton, 'CtrlL')
-            elif sc == 285:
-                return self.findChild(QPushButton, 'CtrlR')
-            elif len(button.text()) == 1 and ord(button.text()) == key:
-                return button
+    def check_key_pressed(self, key, sc, shift_pressed):
+        if key == Qt.Key_Backspace:
+            return self.findChild(QPushButton, 'Back')
+        elif key == Qt.Key_Tab:
+            return self.findChild(QPushButton, 'Tab')
+        elif key == Qt.Key_Escape:
+            return self.findChild(QPushButton, 'Esc')
+        elif key == 16777220:
+            return self.findChild(QPushButton, 'Enter')
+        elif sc == 42:
+            return self.findChild(QPushButton, 'ShiftL')
+        elif sc == 54:
+            return self.findChild(QPushButton, 'ShiftR')
+        elif key == Qt.Key_CapsLock:
+            return self.findChild(QPushButton, 'CapsLk')
+        elif key == Qt.Key_Space:
+            return self.findChild(QPushButton, 'Space')
+        elif sc == 56:
+            return self.findChild(QPushButton, 'AltL')
+        elif sc == 312:
+            return self.findChild(QPushButton, 'AltR')
+        elif sc == 29:
+            return self.findChild(QPushButton, 'CtrlL')
+        elif sc == 285:
+            return self.findChild(QPushButton, 'CtrlR')
+        elif key == Qt.Key_Menu:
+            return self.findChild(QPushButton, 'Menu')
+        elif key == Qt.Key_Meta:
+            return self.findChild(QPushButton, 'WinL')
+        elif shift_pressed and (key in range(33, 65) or key in range(91, 97) or key in range(123, 126)):
+            key_without_shift = [i[0] for i in self.shift_pressed if i[1] == chr(key)]
+            return self.findChild(QPushButton, key_without_shift[0])
+        else:
+            return self.findChild(QPushButton, chr(key))
 
     def change_to_button_pressed_style(self, button):
         if button is not None:
