@@ -1,22 +1,21 @@
 # icons used in application comes from site icon8.com
-from PyQt5 import QtWidgets as Qtw
-from PyQt5 import QtGui as Qtg
-from PyQt5 import QtCore as Qtc
+from PyQt5.QtWidgets import QFrame, QWidget, QStackedWidget, QGridLayout, QDesktopWidget, QApplication, QFileDialog
+from PyQt5.QtGui import QIcon
 import sys
 from menu_window_elements import StatisticsWidget, OptionsWidget, MenuWidget
 from stylesheet import stylesheet
 from game_window import GameWindow
 
 
-class MenuWindow(Qtw.QFrame):
+class MenuWindow(QFrame):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # self.setWindowFlag(Qtc.Qt.FramelessWindowHint)
         # self.setAttribute(Qtc.Qt.WA_TranslucentBackground, True)
-        self.stack = Qtw.QStackedWidget(self)
-        self.stack1_start = Qtw.QWidget()
+        self.stack = QStackedWidget(self)
+        self.stack1_start = QWidget()
         self.stack2_statistics = StatisticsWidget()
         self.stack3_options = OptionsWidget()
         self.stack.addWidget(self.stack1_start)
@@ -33,7 +32,7 @@ class MenuWindow(Qtw.QFrame):
         self.left_menu.options_button.clicked.connect(lambda: self.stack.setCurrentWidget(self.stack3_options))
         self.left_menu.exit_button.clicked.connect(self.close)
 
-        window_layout = Qtw.QGridLayout()
+        window_layout = QGridLayout()
         window_layout.addWidget(self.left_menu, 0, 0)
         window_layout.addWidget(self.stack, 0, 1)
         self.setLayout(window_layout)
@@ -43,26 +42,26 @@ class MenuWindow(Qtw.QFrame):
         if self.file_name == "":
             self.file_name = "resources/text.txt"        # default
         self.game_window = GameWindow(self.file_name)
-        sizeObject = Qtw.QDesktopWidget().screenGeometry(0)
+        sizeObject = QDesktopWidget().screenGeometry(0)
         self.game_window.setGeometry(sizeObject.width() // 2 - 800, sizeObject.height() // 2 - 400, 1500, 800)
         self.game_window.setFixedSize(1500, 800)
-        self.game_window.setWindowIcon(Qtg.QIcon('resources/icons8-keyboard-96.png'))
+        self.game_window.setWindowIcon(QIcon('resources/icons8-keyboard-96.png'))
         self.game_window.setWindowTitle("Master of keyboard")
         self.game_window.show()
         self.close()
 
     def get_text_file(self):
-        self.file_name, _ = Qtw.QFileDialog.getOpenFileName(self, 'Open file', 'C:\\', "Text files (*.txt)")
+        self.file_name, _ = QFileDialog.getOpenFileName(self, 'Open file', 'C:\\', "Text files (*.txt)")
         self.stack3_options.file_chosen_display_label.setText('Chosen file: ' + self.file_name)
 
 
 if __name__ == '__main__':
-    app = Qtw.QApplication(sys.argv)
-    sizeObject = Qtw.QDesktopWidget().screenGeometry(0)
+    app = QApplication(sys.argv)
+    sizeObject = QDesktopWidget().screenGeometry(0)
     app.setStyleSheet(stylesheet)
     window = MenuWindow()
     window.setWindowTitle("Master of keyboard")
     window.setFixedSize(1500, 800)
     window.setGeometry(sizeObject.width()//2 - 800, sizeObject.height()//2 - 400, 1500, 800)
-    window.setWindowIcon(Qtg.QIcon('resources/icons8-keyboard-96.png'))
+    window.setWindowIcon(QIcon('resources/icons8-keyboard-96.png'))
     sys.exit(app.exec_())

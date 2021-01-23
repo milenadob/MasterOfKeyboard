@@ -1,9 +1,9 @@
-from PyQt5.QtWidgets import QApplication, QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QShortcut
-from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QApplication, QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtCore import Qt
 import sys
 from keyboard import KeyboardWidget
 from game_logic import GameLogic
-from threading import Timer
 
 
 class GameWindow(QFrame):
@@ -120,23 +120,23 @@ class CustomLineEdit(QLineEdit):
         super().__init__(*args, **kwargs)
         self.last_key = []
 
-    def keyPressEvent(self, a0: QtGui.QKeyEvent) -> None:
+    def keyPressEvent(self, a0: QKeyEvent) -> None:
         print(a0.key())
-        if int(a0.modifiers()) & QtCore.Qt.ShiftModifier:
+        if int(a0.modifiers()) & Qt.ShiftModifier:
             shift_pressed = True
         else:
             shift_pressed = False
         button = self.parent().parent().keyboard_widget.check_key_pressed(a0.key(), a0.nativeScanCode(), shift_pressed)
         self.parent().parent().keyboard_widget.change_to_button_pressed_style(button)
         [self.parent().parent().keyboard_widget.change_to_button_normal_style(
-                self.parent().parent().keyboard_widget.check_key_pressed(i[0], i[1], i[2]))
-                for i in self.last_key if i[1] != a0.nativeScanCode()]
+            self.parent().parent().keyboard_widget.check_key_pressed(i[0], i[1], i[2]))
+            for i in self.last_key if i[1] != a0.nativeScanCode()]
         self.last_key.clear()
 
         super(CustomLineEdit, self).keyPressEvent(a0)
 
-    def keyReleaseEvent(self, a0: QtGui.QKeyEvent) -> None:
-        if int(a0.modifiers()) & QtCore.Qt.ShiftModifier:
+    def keyReleaseEvent(self, a0: QKeyEvent) -> None:
+        if int(a0.modifiers()) & Qt.ShiftModifier:
             last_shift = True
         else:
             last_shift = False
