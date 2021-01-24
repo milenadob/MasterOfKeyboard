@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit
+from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QLCDNumber
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtCore import Qt, QTimer, QTime, QObject
+from PyQt5.QtCore import Qt, QTimer, QTime, QThread
 from keyboard import KeyboardWidget
 from game_logic import GameLogic
 
@@ -40,24 +40,24 @@ class GameWindowMenu(QFrame):
 
         self.progress_bar = QProgressBar(self)
         self.progress_bar.setGeometry(10, 10, 100, 30)
-        self.time_label = QLabel()
-        self.timer = QTimer(self)
+
         self.data = data
         self.progress_total = 0
         self.progress_step = 1
         self.characters_to_progress = 1
         self.progress = 0
         self.error_label = QLabel()
+        self.clock = QLCDNumber()
 
         layout = QVBoxLayout()
         layout.addWidget(self.progress_bar)
-        layout.addWidget(self.time_label)
         layout.addWidget(self.error_label)
+        layout.addWidget(self.clock)
         self.setLayout(layout)
-        self.timer.timeout.connect(self.print_timer)
-
         self.calculate_progress_step()
-        self.timer.start(100)
+
+        self.timer = TimerThread(self)
+        self.timer.start()
 
     def calculate_progress_step(self):
         self.progress_total = sum(len(i) for i in self.data)
@@ -76,10 +76,22 @@ class GameWindowMenu(QFrame):
             self.progress_bar.setValue(self.progress - self.progress_step)
             self.progress -= self.progress_step
 
-    def print_timer(self):
-        current_time = QTime.currentTime()
-        label_time = current_time.toString('hh:mm:ss.zzz')
-        self.time_label.setText(label_time)
+
+class TimerThread(QThread):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.game_time_miliseconds = 0
+
+    def run(self):
+        timer = QTimer()
+        timer.timeout.connect(self.update_time_label)
+        timer.start(100)
+        self.exec_()
+
+    def update_time_label(self):
+        self.game_time_miliseconds += 1
+        time_show = f"{int(self.game_time_miliseconds/10)}:{self.game_time_miliseconds % 10}"
+        self.parent().clock.display(time_show)
 
 
 class GameWidget(QFrame):
