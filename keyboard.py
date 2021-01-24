@@ -75,8 +75,6 @@ class KeyboardWidget(QFrame):
     def check_key_pressed(self, key, sc, shift_pressed):
         if key == Qt.Key_Backspace:
             return self.findChild(QPushButton, 'Back')
-        elif key == Qt.Key_Tab:
-            return self.findChild(QPushButton, 'Tab')
         elif key == Qt.Key_Escape:
             return self.findChild(QPushButton, 'Esc')
         elif key == 16777220:
