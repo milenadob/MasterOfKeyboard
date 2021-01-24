@@ -11,50 +11,28 @@ class GameWindow(QFrame):
     def __init__(self, file_name, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.game_widget = GameWidget()
-        self.game_menu = GameWindowMenu()
         self.game_logic = GameLogic()
-        self.game_widget.text_input.textChanged.connect(self.check_text_input)
-        self.game_widget.text_input2.textChanged.connect(self.check_text_input)
-        self.game_widget.text_input3.textChanged.connect(self.check_text_input)
+        self.data = self.game_logic.load_data(file_name)
+        self.prepared_data = []
+        self.prepare_data()
+
+        self.game_widget = GameWidget(self.prepared_data)
+        self.game_menu = GameWindowMenu()
 
         window_layout = QGridLayout()
         window_layout.addWidget(self.game_widget, 0, 0)
         window_layout.addWidget(self.game_menu, 0, 1)
         self.setLayout(window_layout)
 
-        self.line_index = 0
-        self.progress = 0
-        self.data = self.game_logic.load_data(file_name)
-        self.lines = len(self.data)
-        self.update_label()
         self.game_logic.start_game()
 
-    def update_label(self):
-        value = self.data[self.line_index]
-        self.game_widget.show_text_label.setText(value)
-
-        if self.line_index + 1 == self.lines:
-            self.game_menu.progress_bar.setValue(100)
-            self.game_logic.end_game()
-            self.game_widget.time_label.setText(str(self.game_logic.total_time))
-        elif self.line_index == 0:
-            self.game_menu.progress_bar.setValue(0)
-        else:
-            self.progress += int(100 / self.lines)
-            self.game_menu.progress_bar.setValue(self.progress)
-
-    def check_text_input(self, text):
-        self.game_widget.text_input.setStyleSheet('color:rgba(112,112,165,180);')
-
-        if text != "":
-            if text in self.data[self.line_index]:
-                if len(text) == len(self.data[self.line_index]):
-                    self.line_index = self.line_index + 1
-                    self.update_label()
-                    self.game_widget.text_input.clear()
-            else:
-                self.game_widget.text_input.setStyleSheet('color:red')
+    def prepare_data(self):
+        if len(self.data) % 3 == 2:
+            self.data.append(" ")
+        elif len(self.data) % 3 == 1:
+            self.data.append(" ")
+            self.data.append(" ")
+        self.prepared_data = ([(self.data[i], self.data[i+1], self.data[i+2]) for i in range(0, len(self.data), 3)])
 
 
 class GameWindowMenu(QFrame):
@@ -64,6 +42,7 @@ class GameWindowMenu(QFrame):
 
         self.progress_bar = QProgressBar(self)
         self.progress_bar.setGeometry(10, 10, 100, 30)
+        self.time_label = QLabel()
 
         layout = QVBoxLayout()
         layout.addWidget(self.progress_bar)
@@ -71,25 +50,28 @@ class GameWindowMenu(QFrame):
 
 
 class GameWidget(QFrame):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, data, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.show_text_label = QLabel()
-        self.time_label = QLabel()
+        self.show_text_label2 = QLabel()
+        self.show_text_label3 = QLabel()
+        self.data = data
+        self.data1, self.data2, self.data3 = zip(*self.data)
         self.text_input = CustomLineEdit()
         self.text_input.returnPressed.connect(self.change_text_input2)
-        self.show_text_label2 = QLabel()
+        self.text_input.textChanged.connect(self.check_text_input)
         self.text_input2 = CustomLineEdit()
         self.text_input2.returnPressed.connect(self.change_text_input3)
-        self.show_text_label3 = QLabel()
+        self.text_input2.textChanged.connect(self.check_text_input)
         self.text_input3 = CustomLineEdit()
         self.text_input3.returnPressed.connect(self.change_text_input)
+        self.text_input3.textChanged.connect(self.check_text_input)
 
         container = QFrame()
         container.setObjectName("text_input_frame")
         entry_layout = QVBoxLayout()
         entry_layout.addWidget(self.show_text_label)
-        entry_layout.addWidget(self.time_label)
         entry_layout.addWidget(self.text_input)
         entry_layout.addWidget(self.show_text_label2)
         entry_layout.addWidget(self.text_input2)
@@ -105,14 +87,68 @@ class GameWidget(QFrame):
         self.setLayout(layout)
         self.setFixedWidth(1100)
 
+        self.line_index = 0
+        self.progress = 0
+        self.lines = len(self.data)
+        self.update_label()
+
+    def change_text_input(self):
+
+        if (len(self.text_input.text()) == len(self.data1[self.line_index]) and
+                self.text_input.text() in self.data1[self.line_index] and
+                len(self.text_input2.text()) == len(self.data2[self.line_index]) and
+                self.text_input2.text() in self.data2[self.line_index] and
+                len(self.text_input3.text()) == len(self.data3[self.line_index]) and
+                self.text_input3.text() in self.data3[self.line_index]):
+
+            self.line_index += 1
+            self.update_label()
+            self.text_input.setFocus()
+            self.text_input.clear()
+            self.text_input2.clear()
+            self.text_input3.clear()
+
     def change_text_input2(self):
         self.text_input2.setFocus()
 
     def change_text_input3(self):
         self.text_input3.setFocus()
 
-    def change_text_input(self):
-        self.text_input.setFocus()
+    def update_label(self):
+        value1 = self.data1[self.line_index]
+        self.show_text_label.setText(value1)
+
+        value2 = self.data2[self.line_index]
+        self.show_text_label2.setText(value2)
+
+        value3 = self.data3[self.line_index]
+        self.show_text_label3.setText(value3)
+
+        # if self.line_index + 1 == self.lines:
+        #     #self.game_menu.progress_bar.setValue(100)
+        #     #self.game_logic.end_game()
+        #     self.time_label.setText(str(self.game_logic.total_time))
+        # elif self.line_index == 0:
+        #     self.game_menu.progress_bar.setValue(0)
+        # else:
+        #     self.progress += int(100 / self.lines)
+        #     self.game_menu.progress_bar.setValue(self.progress)
+
+    def check_text_input(self, text):
+        self.text_input.setStyleSheet('color:rgba(112,112,165,180);')
+        self.text_input2.setStyleSheet('color:rgba(112,112,165,180);')
+        self.text_input3.setStyleSheet('color:rgba(112,112,165,180);')
+
+        if text != "":
+            if self.sender() is self.text_input:
+                if text not in self.data1[self.line_index]:
+                    self.text_input.setStyleSheet('color:red')
+            if self.sender() is self.text_input2:
+                if text not in self.data2[self.line_index]:
+                    self.text_input2.setStyleSheet('color:red')
+            if self.sender() is self.text_input3:
+                if text not in self.data3[self.line_index]:
+                    self.text_input3.setStyleSheet('color:red')
 
 
 class CustomLineEdit(QLineEdit):
@@ -121,7 +157,6 @@ class CustomLineEdit(QLineEdit):
         self.last_key = []
 
     def keyPressEvent(self, a0: QKeyEvent) -> None:
-        print(a0.key())
         if int(a0.modifiers()) & Qt.ShiftModifier:
             shift_pressed = True
         else:
@@ -132,7 +167,6 @@ class CustomLineEdit(QLineEdit):
             self.parent().parent().keyboard_widget.check_key_pressed(i[0], i[1], i[2]))
             for i in self.last_key if i[1] != a0.nativeScanCode()]
         self.last_key.clear()
-
         super(CustomLineEdit, self).keyPressEvent(a0)
 
     def keyReleaseEvent(self, a0: QKeyEvent) -> None:
