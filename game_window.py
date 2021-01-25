@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLab
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal
 from keyboard import KeyboardWidget
-from game_logic import GameLogic
 
 
 class GameWindow(QFrame):
@@ -10,8 +9,7 @@ class GameWindow(QFrame):
     def __init__(self, file_name, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.game_logic = GameLogic()
-        self.data = self.game_logic.load_data(file_name)
+        self.data = self.load_data(file_name)
         self.prepared_data = []
         self.prepare_data()
         self.game_menu = GameWindowMenu(self.data)
@@ -22,7 +20,11 @@ class GameWindow(QFrame):
         window_layout.addWidget(self.game_menu, 0, 1)
         self.setLayout(window_layout)
 
-        self.game_logic.start_game()
+    def load_data(self, file_name):
+        with open(file_name, 'r') as f:
+            data = f.readlines()
+        data = [line.rstrip('\n') for line in data]
+        return data
 
     def prepare_data(self):
         if len(self.data) % 3 == 2:
@@ -87,10 +89,9 @@ class GameWindowMenu(QFrame):
 
     def show_end_game_dialog(self):
         msgBox = QMessageBox()
-        msgBox.setIcon(QMessageBox.Information)
         msgBox.setText(f"Game time: {self.end_game_time} \n{self.error_label.text()} \nWpm: {self.end_wpm}")
         msgBox.setWindowTitle("End Game")
-        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msgBox.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
         msgBox.buttonClicked.connect(self.on_ok_button_clicked)
         msgBox.exec_()
 
@@ -280,21 +281,21 @@ class GameWidget(QFrame):
 
         if text != "":
             if self.sender() is self.text_input:
-                if text not in self.data1[self.line_index]:
+                if text != self.data1[self.line_index][0:len(text)]:
                     self.text_input.setStyleSheet('color:red')
                     self.bad_characters += 1
                     self.errors += 1
                 else:
                     self.good_characters += 1
-            if self.sender() is self.text_input2:
-                if text not in self.data2[self.line_index]:
+            elif self.sender() is self.text_input2:
+                if text != self.data2[self.line_index][0:len(text)]:
                     self.text_input2.setStyleSheet('color:red')
                     self.bad_characters += 1
                     self.errors += 1
                 else:
                     self.good_characters += 1
-            if self.sender() is self.text_input3:
-                if text not in self.data3[self.line_index]:
+            elif self.sender() is self.text_input3:
+                if text != self.data3[self.line_index][0:len(text)]:
                     self.text_input3.setStyleSheet('color:red')
                     self.bad_characters += 1
                     self.errors += 1

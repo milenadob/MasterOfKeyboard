@@ -114,4 +114,27 @@ GameWidget QFrame#text_input_frame{
     border: 3px solid rgb(112,112,170);
     padding:10px;
 }
+
+QMessageBox{
+    background-color: rgba(112,112,165,180);
+}
+
+QMessageBox QLabel{
+    font-size: 25px;
+    max-height: 60px;
+    margin-left: 15px;
+    margin-right: 15px;
+    color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 rgba(240,213,255,180), stop:1 rgba(181,238,255,180));
+    min-height: 100px;
+    min-width: 300px;
+}
+
+QMessageBox QPushButton{
+    background-color:rgba(179,179,255,180);
+    border-radius: 5;
+    color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 rgba(240,213,255,180), stop:1 rgba(181,238,255,180));
+    border-color:qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 rgba(240,213,255,180), stop:1 rgba(181,238,255,180));
+    min-height: 20px;
+    min-width:60px;
+}
 """
