@@ -48,16 +48,20 @@ class GameWindowMenu(QFrame):
         self.characters_to_progress = 1
         self.progress = 0
         self.error_label = QLabel()
+        self.wpm_label = QLabel()
         self.clock = QLCDNumber()
         self.clock.setMaximumHeight(48)
         self.clock.setDigitCount(8)
 
         self.end_game_time = ""
         self.end_wpm = ""
+        self.momentary_text_len = 0
+        self.previous_text_len = 0
         layout = QVBoxLayout()
         layout.addWidget(self.progress_bar)
         layout.addWidget(self.error_label)
         layout.addWidget(self.clock)
+        layout.addWidget(self.wpm_label)
         self.setLayout(layout)
         self.calculate_progress_step()
         self.end_window.connect(self.show_end_game_dialog)
@@ -84,7 +88,7 @@ class GameWindowMenu(QFrame):
     def show_end_game_dialog(self):
         msgBox = QMessageBox()
         msgBox.setIcon(QMessageBox.Information)
-        msgBox.setText(f"Game time: {self.end_game_time} \n  {self.error_label.text()} \n {self.end_wpm}")
+        msgBox.setText(f"Game time: {self.end_game_time} \n{self.error_label.text()} \nWpm: {self.end_wpm}")
         msgBox.setWindowTitle("End Game")
         msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         msgBox.buttonClicked.connect(self.on_ok_button_clicked)
@@ -106,7 +110,7 @@ class TimerThread(QThread):
 
     def run(self):
         self.timer = QTimer()
-        self.timer.timeout.connect(self.update_time_label)
+        self.timer.timeout.connect(self.timed_tasks)
 
         def stop_timer():
             self.timer.stop()
@@ -116,6 +120,10 @@ class TimerThread(QThread):
 
         self.timer.start(100)
         self.exec_()
+
+    def timed_tasks(self):
+        self.update_time_label()
+        self.wpm_calculating()
 
     def update_time_label(self):
         self.game_time_ms += 10
@@ -138,6 +146,13 @@ class TimerThread(QThread):
         time_show = f"{minutes}:{seconds}:{ms}"
         self.parent().clock.display(time_show)
         self.parent().end_game_time = time_show
+
+    def wpm_calculating(self):
+        words =(self.parent().previous_text_len + self.parent().momentary_text_len) / 5
+        minutes = (self.game_time_ms/(100*60)) % 60     # game_time_ms is calculated every 10ms
+        wpm = (int)(words / minutes)
+        self.parent().wpm_label.setText(str(wpm))
+        self.parent().end_wpm = str(wpm)
 
 
 class GameWidget(QFrame):
@@ -186,7 +201,6 @@ class GameWidget(QFrame):
         self.bad_characters = 0
         self.deleted_characters = 0
         self.inputs_text_len = 0
-        self.all_inputs_text_len = 0
         self.previous_progress = 0
         self.errors = 0
         self.end = False
@@ -203,7 +217,8 @@ class GameWidget(QFrame):
                 self.text_input2.text() in self.data2[self.line_index] and
                 len(self.text_input3.text()) == len(self.data3[self.line_index]) and
                 self.text_input3.text() in self.data3[self.line_index]):
-
+            self.game_menu.previous_text_len += len(self.text_input3.text())
+            self.game_menu.momentary_text_len = 0
             self.line_index += 1
             self.update_label()
             self.text_input.setFocus()
@@ -220,6 +235,8 @@ class GameWidget(QFrame):
     def change_text_input2(self):
         if (len(self.text_input.text()) == len(self.data1[self.line_index]) and
                 self.text_input.text() in self.data1[self.line_index]):
+            self.game_menu.previous_text_len += len(self.text_input.text())
+            self.game_menu.momentary_text_len = 0
             self.inputs_text_len = 0
             self.previous_progress = self.game_menu.progress
             self.text_input2.setFocus()
@@ -233,6 +250,8 @@ class GameWidget(QFrame):
     def change_text_input3(self):
         if (len(self.text_input2.text()) == len(self.data2[self.line_index]) and
                 self.text_input2.text() in self.data2[self.line_index]):
+            self.game_menu.previous_text_len += len(self.text_input2.text())
+            self.game_menu.momentary_text_len = 0
             self.inputs_text_len = 0
             self.previous_progress = self.game_menu.progress
             self.text_input3.setFocus()
@@ -257,6 +276,7 @@ class GameWidget(QFrame):
         self.text_input.setStyleSheet('color:rgba(112,112,165,180);')
         self.text_input2.setStyleSheet('color:rgba(112,112,165,180);')
         self.text_input3.setStyleSheet('color:rgba(112,112,165,180);')
+        self.game_menu.momentary_text_len = len(text)
 
         if text != "":
             if self.sender() is self.text_input:
