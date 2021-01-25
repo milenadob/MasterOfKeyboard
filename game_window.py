@@ -50,7 +50,8 @@ class GameWindowMenu(QFrame):
         self.progress = 0
         self.error_label = QLabel()
         self.clock = QLCDNumber()
-
+        self.clock.setMaximumHeight(48)
+        self.clock.setDigitCount(8)
         layout = QVBoxLayout()
         layout.addWidget(self.progress_bar)
         layout.addWidget(self.error_label)
@@ -92,8 +93,24 @@ class TimerThread(QThread):
         self.exec_()
 
     def update_time_label(self):
-        self.game_time_ms += 1
-        time_show = f"{int((self.game_time_ms/10)/60)}:{int(self.game_time_ms/10)}:{self.game_time_ms % 10}"
+        self.game_time_ms += 10
+        if int((self.game_time_ms/100)/60) == 0:
+            minutes = "00"
+        elif int((self.game_time_ms/100)/60) < 10:
+            minutes = "0" + str(int((self.game_time_ms/100)/60))
+        else:
+            minutes = int((self.game_time_ms / 100) / 60)
+        if int((self.game_time_ms / 100) % 60) == 0:
+            seconds = "00"
+        elif int((self.game_time_ms / 100) % 60) < 10:
+            seconds = "0" + str(int((self.game_time_ms / 100) % 60))
+        else:
+            seconds = int((self.game_time_ms / 100) % 60)
+        if self.game_time_ms % 100 < 10:
+            ms = "0" + str(self.game_time_ms % 100)
+        else:
+            ms = self.game_time_ms % 100
+        time_show = f"{minutes}:{seconds}:{ms}"
         self.parent().clock.display(time_show)
 
     def stop_timer(self):
