@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QLCDNumber, QPushButton
+from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QLCDNumber, QMessageBox, QApplication
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal
 from keyboard import KeyboardWidget
@@ -34,6 +34,7 @@ class GameWindow(QFrame):
 
 
 class GameWindowMenu(QFrame):
+    end_window = pyqtSignal()
 
     def __init__(self, data, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -50,16 +51,16 @@ class GameWindowMenu(QFrame):
         self.clock = QLCDNumber()
         self.clock.setMaximumHeight(48)
         self.clock.setDigitCount(8)
-        self.end_button = QPushButton("end")
-        self.end_button.clicked.connect(self.after_end_button_click)
+
+        self.end_game_time = ""
+        self.end_wpm = ""
         layout = QVBoxLayout()
-        layout.addWidget(self.end_button)
         layout.addWidget(self.progress_bar)
         layout.addWidget(self.error_label)
         layout.addWidget(self.clock)
         self.setLayout(layout)
         self.calculate_progress_step()
-
+        self.end_window.connect(self.show_end_game_dialog)
         self.timer = TimerThread(self)
         self.timer.start()
 
@@ -80,9 +81,20 @@ class GameWindowMenu(QFrame):
             self.progress_bar.setValue(self.progress - self.progress_step)
             self.progress -= self.progress_step
 
-    def after_end_button_click(self):
+    def show_end_game_dialog(self):
+        msgBox = QMessageBox()
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setText(f"Game time: {self.end_game_time} \n  {self.error_label.text()} \n {self.end_wpm}")
+        msgBox.setWindowTitle("End Game")
+        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msgBox.buttonClicked.connect(self.on_ok_button_clicked)
+        msgBox.exec_()
+
+    def on_ok_button_clicked(self):
         self.timer.quit()
         self.timer.wait()
+        print("OK")
+        QApplication.quit()
 
 
 class TimerThread(QThread):
@@ -125,6 +137,7 @@ class TimerThread(QThread):
             ms = self.game_time_ms % 100
         time_show = f"{minutes}:{seconds}:{ms}"
         self.parent().clock.display(time_show)
+        self.parent().end_game_time = time_show
 
 
 class GameWidget(QFrame):
@@ -201,6 +214,7 @@ class GameWidget(QFrame):
             self.game_menu.progress_bar.setValue(100)
             self.game_menu.error_label.setText("Errors: " + str(self.errors))
             self.game_menu.timer.timer_stop.emit()
+            self.game_menu.end_window.emit()
             self.end = True
 
     def change_text_input2(self):
@@ -213,6 +227,7 @@ class GameWidget(QFrame):
             self.game_menu.progress_bar.setValue(100)
             self.game_menu.error_label.setText("Errors: " + str(self.errors))
             self.game_menu.timer.timer_stop.emit()
+            self.game_menu.end_window.emit()
             self.end = True
 
     def change_text_input3(self):
@@ -225,6 +240,7 @@ class GameWidget(QFrame):
             self.game_menu.progress_bar.setValue(100)
             self.game_menu.error_label.setText("Errors: " + str(self.errors))
             self.game_menu.timer.timer_stop.emit()
+            self.game_menu.end_window.emit()
             self.end = True
 
     def update_label(self):
