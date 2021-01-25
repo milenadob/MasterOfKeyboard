@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QLCDNumber
+from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QLCDNumber, QPushButton
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal
 from keyboard import KeyboardWidget
@@ -35,8 +35,6 @@ class GameWindow(QFrame):
 
 class GameWindowMenu(QFrame):
 
-    timer_stop = pyqtSignal()
-
     def __init__(self, data, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -52,7 +50,10 @@ class GameWindowMenu(QFrame):
         self.clock = QLCDNumber()
         self.clock.setMaximumHeight(48)
         self.clock.setDigitCount(8)
+        self.end_button = QPushButton("end")
+        self.end_button.clicked.connect(self.after_end_button_click)
         layout = QVBoxLayout()
+        layout.addWidget(self.end_button)
         layout.addWidget(self.progress_bar)
         layout.addWidget(self.error_label)
         layout.addWidget(self.clock)
@@ -79,16 +80,28 @@ class GameWindowMenu(QFrame):
             self.progress_bar.setValue(self.progress - self.progress_step)
             self.progress -= self.progress_step
 
+    def after_end_button_click(self):
+        self.timer.quit()
+        self.timer.wait()
+
 
 class TimerThread(QThread):
+    timer_stop = pyqtSignal()
+
     def __init__(self, parent):
         super().__init__(parent)
         self.game_time_ms = 0
 
     def run(self):
         self.timer = QTimer()
-        self.parent().timer_stop.connect(self.stop_timer)
         self.timer.timeout.connect(self.update_time_label)
+
+        def stop_timer():
+            self.timer.stop()
+            self.timer.deleteLater()
+
+        self.timer_stop.connect(stop_timer)
+
         self.timer.start(100)
         self.exec_()
 
@@ -112,9 +125,6 @@ class TimerThread(QThread):
             ms = self.game_time_ms % 100
         time_show = f"{minutes}:{seconds}:{ms}"
         self.parent().clock.display(time_show)
-
-    def stop_timer(self):
-        self.timer.stop()
 
 
 class GameWidget(QFrame):
@@ -166,6 +176,7 @@ class GameWidget(QFrame):
         self.all_inputs_text_len = 0
         self.previous_progress = 0
         self.errors = 0
+        self.end = False
 
         self.update_label()
 
@@ -186,12 +197,11 @@ class GameWidget(QFrame):
             self.text_input.clear()
             self.text_input2.clear()
             self.text_input3.clear()
-        if self.data1[self.line_index] == "":
+        if self.data1[self.line_index] == "" and not self.end:
             self.game_menu.progress_bar.setValue(100)
             self.game_menu.error_label.setText("Errors: " + str(self.errors))
-            self.game_menu.timer_stop.emit()
-            self.game_menu.timer.quit()
-            self.game_menu.timer.wait()
+            self.game_menu.timer.timer_stop.emit()
+            self.end = True
 
     def change_text_input2(self):
         if (len(self.text_input.text()) == len(self.data1[self.line_index]) and
@@ -199,6 +209,11 @@ class GameWidget(QFrame):
             self.inputs_text_len = 0
             self.previous_progress = self.game_menu.progress
             self.text_input2.setFocus()
+        if self.data2[self.line_index] == "" and not self.end:
+            self.game_menu.progress_bar.setValue(100)
+            self.game_menu.error_label.setText("Errors: " + str(self.errors))
+            self.game_menu.timer.timer_stop.emit()
+            self.end = True
 
     def change_text_input3(self):
         if (len(self.text_input2.text()) == len(self.data2[self.line_index]) and
@@ -206,6 +221,11 @@ class GameWidget(QFrame):
             self.inputs_text_len = 0
             self.previous_progress = self.game_menu.progress
             self.text_input3.setFocus()
+        if self.data3[self.line_index] == "" and not self.end:
+            self.game_menu.progress_bar.setValue(100)
+            self.game_menu.error_label.setText("Errors: " + str(self.errors))
+            self.game_menu.timer.timer_stop.emit()
+            self.end = True
 
     def update_label(self):
         value1 = self.data1[self.line_index]
