@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QLCDNumber
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtCore import Qt, QTimer, QTime, QThread
+from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal
 from keyboard import KeyboardWidget
 from game_logic import GameLogic
 
@@ -34,6 +34,8 @@ class GameWindow(QFrame):
 
 
 class GameWindowMenu(QFrame):
+
+    timer_stop = pyqtSignal()
 
     def __init__(self, data, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -80,18 +82,22 @@ class GameWindowMenu(QFrame):
 class TimerThread(QThread):
     def __init__(self, parent):
         super().__init__(parent)
-        self.game_time_miliseconds = 0
+        self.game_time_ms = 0
 
     def run(self):
-        timer = QTimer()
-        timer.timeout.connect(self.update_time_label)
-        timer.start(100)
+        self.timer = QTimer()
+        self.parent().timer_stop.connect(self.stop_timer)
+        self.timer.timeout.connect(self.update_time_label)
+        self.timer.start(100)
         self.exec_()
 
     def update_time_label(self):
-        self.game_time_miliseconds += 1
-        time_show = f"{int(self.game_time_miliseconds/10)}:{self.game_time_miliseconds % 10}"
+        self.game_time_ms += 1
+        time_show = f"{int((self.game_time_ms/10)/60)}:{int(self.game_time_ms/10)}:{self.game_time_ms % 10}"
         self.parent().clock.display(time_show)
+
+    def stop_timer(self):
+        self.timer.stop()
 
 
 class GameWidget(QFrame):
@@ -166,6 +172,9 @@ class GameWidget(QFrame):
         if self.data1[self.line_index] == "":
             self.game_menu.progress_bar.setValue(100)
             self.game_menu.error_label.setText("Errors: " + str(self.errors))
+            self.game_menu.timer_stop.emit()
+            self.game_menu.timer.quit()
+            self.game_menu.timer.wait()
 
     def change_text_input2(self):
         if (len(self.text_input.text()) == len(self.data1[self.line_index]) and
@@ -272,4 +281,3 @@ class CustomLineEdit(QLineEdit):
             last_shift = False
         self.last_key.append((a0.key(), a0.nativeScanCode(), last_shift))
         super(CustomLineEdit, self).keyReleaseEvent(a0)
-
