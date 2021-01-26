@@ -107,7 +107,8 @@ class KeyboardWidget(QFrame):
 
     def change_to_button_pressed_style(self, button):
         if button is not None:
-            button.setStyleSheet("background-color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 rgba(240,213,255,180), stop:1 rgba(181,238,255,180));")
+            button.setStyleSheet("""background-color: 
+            qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 rgba(240,213,255,180), stop:1 rgba(181,238,255,180));""")
 
     def change_to_button_normal_style(self, button):
         if button is not None:

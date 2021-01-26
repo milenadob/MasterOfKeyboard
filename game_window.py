@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QLCDNumber, QMessageBox, QApplication
+from PyQt5.QtWidgets import (QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QLCDNumber,
+                             QMessageBox, QApplication)
 from PyQt5.QtGui import QKeyEvent, QIcon
 from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal, QDate
 from keyboard import KeyboardWidget
@@ -9,7 +10,9 @@ class GameWindow(QFrame):
     def __init__(self, file_name, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.data = self.load_data(file_name)
+        self.file_name = file_name
+        self.data = []
+        self.load_data()
         self.prepared_data = []
         self.prepare_data()
         self.game_menu = GameWindowMenu(self.data)
@@ -20,11 +23,10 @@ class GameWindow(QFrame):
         window_layout.addWidget(self.game_menu, 0, 1)
         self.setLayout(window_layout)
 
-    def load_data(self, file_name):
-        with open(file_name, 'r') as f:
+    def load_data(self):
+        with open(self.file_name, 'r') as f:
             data = f.readlines()
-        data = [line.rstrip('\n') for line in data]
-        return data
+        self.data = [line.rstrip('\n') for line in data]
 
     def prepare_data(self):
         if len(self.data) % 3 == 2:
@@ -46,31 +48,41 @@ class GameWindowMenu(QFrame):
         super().__init__(*args, **kwargs)
 
         self.progress_bar = QProgressBar(self)
-        self.progress_bar.setGeometry(10, 10, 100, 30)
-
+        self.progress_bar.setMinimumHeight(48)
         self.data = data
         self.progress_total = 0
         self.progress_step = 1
         self.characters_to_progress = 1
         self.progress = 0
-        self.error_label = QLabel()
+
+        self.error_label = QLabel("Errors: ")
         self.wpm_label = QLabel()
+        container = QFrame()
+        container.setObjectName("wpm_error_frame")
+        wpm_error_layout = QVBoxLayout()
+        wpm_error_layout.addWidget(self.error_label)
+        wpm_error_layout.addWidget(self.wpm_label)
+        container.setLayout(wpm_error_layout)
         self.clock = QLCDNumber()
         self.clock.setMaximumHeight(48)
+        self.clock.setMinimumHeight(48)
         self.clock.setDigitCount(8)
 
         self.end_game_time = ""
         self.end_wpm = ""
         self.momentary_text_len = 0
         self.previous_text_len = 0
+
         layout = QVBoxLayout()
         layout.addWidget(self.progress_bar)
-        layout.addWidget(self.error_label)
         layout.addWidget(self.clock)
-        layout.addWidget(self.wpm_label)
+        layout.addWidget(container)
+        layout.addStretch(1)
         self.setLayout(layout)
+
         self.calculate_progress_step()
         self.end_window.connect(self.show_end_game_dialog)
+
         self.timer = TimerThread(self)
         self.timer.start()
 
@@ -92,13 +104,13 @@ class GameWindowMenu(QFrame):
             self.progress -= self.progress_step
 
     def show_end_game_dialog(self):
-        msgBox = QMessageBox()
-        msgBox.setWindowIcon(QIcon('resources/icons8-keyboard-96.png'))
-        msgBox.setText(f"Game time: {self.end_game_time} \n{self.error_label.text()} \nWpm: {self.end_wpm}")
-        msgBox.setWindowTitle("End Game")
-        msgBox.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
-        msgBox.buttonClicked.connect(self.on_ok_button_clicked)
-        msgBox.exec_()
+        msg_box = QMessageBox()
+        msg_box.setWindowIcon(QIcon('resources/icons8-keyboard-96.png'))
+        msg_box.setText(f"Game time: {self.end_game_time} \n{self.error_label.text()} \nWpm: {self.end_wpm}")
+        msg_box.setWindowTitle("End Game")
+        msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
+        msg_box.buttonClicked.connect(self.on_ok_button_clicked)
+        msg_box.exec_()
 
     def on_ok_button_clicked(self):
         self.timer.quit()
@@ -118,16 +130,16 @@ class TimerThread(QThread):
         self.game_time_ms = 0
 
     def run(self):
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.timed_tasks)
+        timer = QTimer()
+        timer.timeout.connect(self.timed_tasks)
 
         def stop_timer():
-            self.timer.stop()
-            self.timer.deleteLater()
+            timer.stop()
+            timer.deleteLater()
 
         self.timer_stop.connect(stop_timer)
 
-        self.timer.start(100)
+        timer.start(100)
         self.exec_()
 
     def timed_tasks(self):
@@ -157,9 +169,9 @@ class TimerThread(QThread):
         self.parent().end_game_time = time_show
 
     def wpm_calculating(self):
-        words =(self.parent().previous_text_len + self.parent().momentary_text_len) / 5
+        words = (self.parent().previous_text_len + self.parent().momentary_text_len) / 5
         minutes = (self.game_time_ms/(100*60)) % 60     # game_time_ms is calculated every 10ms
-        wpm = (int)(words / minutes)
+        wpm = int(words / minutes)
         self.parent().wpm_label.setText("Wpm: " + str(wpm))
         self.parent().end_wpm = str(wpm)
 
@@ -179,9 +191,11 @@ class GameWidget(QFrame):
         self.text_input = CustomLineEdit()
         self.text_input.returnPressed.connect(self.change_text_input2)
         self.text_input.textChanged.connect(self.check_text_input)
+
         self.text_input2 = CustomLineEdit()
         self.text_input2.returnPressed.connect(self.change_text_input3)
         self.text_input2.textChanged.connect(self.check_text_input)
+
         self.text_input3 = CustomLineEdit()
         self.text_input3.returnPressed.connect(self.change_text_input)
         self.text_input3.textChanged.connect(self.check_text_input)
@@ -336,6 +350,7 @@ class GameWidget(QFrame):
             elif self.good_characters == self.game_menu.characters_to_progress:
                 self.game_menu.set_progress_bar(True)
                 self.good_characters = 0
+            self.game_menu.error_label.setText("Errors: " + str(self.errors))
 
 
 class CustomLineEdit(QLineEdit):

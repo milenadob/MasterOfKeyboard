@@ -111,6 +111,19 @@ GameWindowMenu{
     padding-top:20px;
     padding-bottom:20px;
 }
+GameWindowMenu QFrame#wpm_error_frame{
+    background-color: rgba(255,255,255,180);
+    border-radius: 5px;
+    border: 3px solid rgb(112,112,170);
+    padding:10px;
+    max-height: 100px;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+GameWindowMenu QLabel{
+    font-size: 30px;
+    max-height: 40px;
+}
 
 KeyboardWidget{
     background-color: rgba(255,255,255,180);
