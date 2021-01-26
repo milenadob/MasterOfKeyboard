@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QLCDNumber, QMessageBox, QApplication
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtGui import QKeyEvent, QIcon
 from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal, QDate
 from keyboard import KeyboardWidget
 
@@ -30,6 +30,10 @@ class GameWindow(QFrame):
         if len(self.data) % 3 == 2:
             self.data.append("")
         elif len(self.data) % 3 == 1:
+            self.data.append("")
+            self.data.append("")
+        else:
+            self.data.append("")
             self.data.append("")
             self.data.append("")
         self.prepared_data = ([(self.data[i], self.data[i+1], self.data[i+2]) for i in range(0, len(self.data), 3)])
@@ -89,6 +93,7 @@ class GameWindowMenu(QFrame):
 
     def show_end_game_dialog(self):
         msgBox = QMessageBox()
+        msgBox.setWindowIcon(QIcon('resources/icons8-keyboard-96.png'))
         msgBox.setText(f"Game time: {self.end_game_time} \n{self.error_label.text()} \nWpm: {self.end_wpm}")
         msgBox.setWindowTitle("End Game")
         msgBox.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
@@ -101,7 +106,7 @@ class GameWindowMenu(QFrame):
         with open("resources/wpm_daily.txt", "a") as f:
             now = QDate.currentDate()
             record = f"{self.end_wpm} {now.toString(Qt.ISODate)}"
-            f.write(record)
+            f.write(record + "\n")
         QApplication.quit()
 
 
@@ -155,7 +160,7 @@ class TimerThread(QThread):
         words =(self.parent().previous_text_len + self.parent().momentary_text_len) / 5
         minutes = (self.game_time_ms/(100*60)) % 60     # game_time_ms is calculated every 10ms
         wpm = (int)(words / minutes)
-        self.parent().wpm_label.setText(str(wpm))
+        self.parent().wpm_label.setText("Wpm: " + str(wpm))
         self.parent().end_wpm = str(wpm)
 
 

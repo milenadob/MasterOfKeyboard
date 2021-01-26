@@ -12,14 +12,20 @@ QPushButton{
 QPushButton:pressed{
     background-color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 rgba(240,213,255,180), stop:1 rgba(181,238,255,180));
 }
+QLabel{
+    color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 #d60cf0, stop:1 #9a08ed);
+}
+
 QLineEdit{
     background: transparent;
     border:none;
     font-size: 20px;
 }
+
 MenuWindow{
     border-image: url(resources/key.png) 0 0 0 0 stretch stretch;
 }
+
 MenuWidget{
     border-radius: 10px;
     background-color: rgba(255,255,255,180);
@@ -45,24 +51,29 @@ OptionsWidget, StatisticsWidget{
 }
 
 OptionsWidget QLabel{
-    font-size: 20px;
+    font-size: 30px;
     max-height: 60px;
     margin-left: 15px;
     margin-right: 15px;
 }
+
 OptionsWidget QPushButton{
     max-height: 60px;
     max-width: 190px;
+    margin-left: 90px;
 }
 
-QLabel[cssClass = 'display']{
-    border-image: url(resources/blue_button13.png);
-    max-width: 400px;
+OptionsWidget QLabel[cssClass = 'display']{
+    background-color:rgba(112,112,165,80) ;
     padding-left: 10px;
+    font-size: 20px;
+    border-radius: 10px;
 }
+
 GameWindow{
     background-color: rgb(211,211,211);
 }
+
 GameWindow QProgressBar{
     border: 2px solid gray;
     border-radius: 5px;
@@ -86,6 +97,13 @@ GameWidget{
     padding:20px;
 }
 
+GameWidget QFrame#text_input_frame{
+    background-color: rgba(255,255,255,180);
+    border-radius: 5px;
+    border: 3px solid rgb(112,112,170);
+    padding:10px;
+}
+
 GameWindowMenu{
     background-color: rgba(112,112,165,180);
     margin-left: 20px;
@@ -106,13 +124,6 @@ KeyboardWidget{
 KeyboardWidget QPushButton{
     background-color: rgba(255,255,255,255);
     border-radius: 5;
-}
-
-GameWidget QFrame#text_input_frame{
-    background-color: rgba(255,255,255,180);
-    border-radius: 5px;
-    border: 3px solid rgb(112,112,170);
-    padding:10px;
 }
 
 QMessageBox{
