@@ -6,6 +6,7 @@ from PyQt5.QtCore import QSize
 import sys
 from stylesheet import stylesheet
 from game_window import GameWindow
+import pyqtgraph as pg
 
 
 class MenuWindow(QFrame):
@@ -61,9 +62,47 @@ class StatisticsWidget(QFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.day_dict = dict()
+        self.wpm = []
+        self.graph_dotted = None
+        self.prepare_wpm_daily_data()
+        self.make_wpm_daily_graph()
+
         layout = QVBoxLayout()
+        layout.addWidget(self.graph_dotted)
         self.setLayout(layout)
         self.setFixedSize(1100, 750)
+
+    def make_wpm_daily_graph(self):
+        string_axis = pg.AxisItem(orientation='bottom')
+        string_axis.setTicks([self.day_dict.items()])
+        self.graph_dotted = pg.PlotWidget(axisItems={'bottom': string_axis})
+        self.graph_dotted.setBackground("w")
+        pen = pg.mkPen(color=(214, 12, 240))
+        label_style = {"color": "#d60cf0", "font-size": "20px"}
+        self.graph_dotted.setTitle("Best wpm got in a day", **label_style)
+        self.graph_dotted.setLabel("bottom", "Date", **label_style)
+        self.graph_dotted.setLabel("left", "WPM", **label_style)
+        self.graph_dotted.plot(list(self.day_dict.keys()), self.wpm, pen=pen, symbol="+", symbolSize=20, symbolBrush='c')
+
+    def prepare_wpm_daily_data(self):
+        with open("resources/wpm_daily.txt", 'r') as f:
+            data = f.readlines()
+        data = [line.rstrip("\n") for line in data]
+        fields = [line.split(" ") for line in data]
+        result = {}
+        for field in fields:
+            if field[1] in result:
+                result[field[1]].append(field[0])
+            else:
+                result[field[1]] = [field[0]]
+        print(result)
+        for a in result.items():
+            result[a[0]] = max(a[1])
+        print(result)
+        day = list(result.keys())
+        self.wpm = [int(i) for i in result.values()]
+        self.day_dict = dict(enumerate(day))
 
 
 class OptionsWidget(QFrame):

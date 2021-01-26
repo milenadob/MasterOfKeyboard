@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QFrame, QGridLayout, QProgressBar, QVBoxLayout, QLabel, QLineEdit, QLCDNumber, QMessageBox, QApplication
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal, QDate
 from keyboard import KeyboardWidget
 
 
@@ -98,7 +98,10 @@ class GameWindowMenu(QFrame):
     def on_ok_button_clicked(self):
         self.timer.quit()
         self.timer.wait()
-        print("OK")
+        with open("resources/wpm_daily.txt", "a") as f:
+            now = QDate.currentDate()
+            record = f"{self.end_wpm} {now.toString(Qt.ISODate)}"
+            f.write(record)
         QApplication.quit()
 
 
